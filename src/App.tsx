@@ -1,4 +1,4 @@
 import React from "react";
-import { SubmissionsPage } from "./components/SubmissionsPage/SubmissionsPage";
+import HomePage from "./pages/HomePage/HomePage";
 
-export const App: React.FC = () => <SubmissionsPage />;
+export const App: React.FC = () => <HomePage />;
