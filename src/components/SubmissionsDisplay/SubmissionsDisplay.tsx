@@ -1,17 +1,24 @@
 import React, { useState, useMemo } from "react";
-import { useSubmissionsQuery, useBindSubmissionMutation } from "../../api/submissions";
+import {
+  useSubmissionsQuery,
+  useBindSubmissionMutation,
+  useDeleteSubmissionMutation,
+} from "../../api/submissions";
 import { Container, Loading, Error } from "./SubmissionsDisplay.styles";
-import CreateSubmissionDialog from "../CreateSubmissionDialog/CreateSubmissionDialog";
+import CreateOrUpdateSubmissionDialog from "../CreateOrUpdateSubmissionDialog/CreateOrUpdateSubmissionDialog";
 import SubmissionsActions from "../SubmissionsActions/SubmissionsActions";
 import SubmissionsTable from "../SubmissionsTable/SubmissionsTable";
 
 const SubmissionsDisplay: React.FC = () => {
   const { data: submissions, isLoading, error } = useSubmissionsQuery();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogState, setDialogState] = useState<{ id?: number; name?: string } | null>(null);
   const [filterText, setFilterText] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [bindingId, setBindingId] = useState<number | null>(null);
-  const bindMutation = useBindSubmissionMutation((_data, _id) => setBindingId(null));
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  const bindMutation = useBindSubmissionMutation(() => setBindingId(null));
+  const deleteMutation = useDeleteSubmissionMutation(() => setDeletingId(null));
 
   const filteredSubmissions = useMemo(() => {
     if (!submissions) return [];
@@ -22,30 +29,25 @@ const SubmissionsDisplay: React.FC = () => {
     });
   }, [submissions, filterText, statusFilter]);
 
-  const handleCreateNew = () => {
-    setIsDialogOpen(true);
-  };
+  const handleCreateNew = () => setDialogState({});
 
   const handleBind = (id: number) => {
     setBindingId(id);
     bindMutation.mutate(id);
   };
 
-  if (isLoading) {
-    return (
-      <Container>
-        <Loading>Loading submissions...</Loading>
-      </Container>
-    );
-  }
+  const handleDelete = (id: number) => {
+    setDeletingId(id);
+    deleteMutation.mutate(id);
+  };
 
-  if (error) {
-    return (
-      <Container>
-        <Error>Error loading submissions: {error.message}</Error>
-      </Container>
-    );
-  }
+  const handleEdit = (id: number) => {
+    const submission = submissions?.find((s) => s.id === id);
+    if (submission) setDialogState({ id: submission.id, name: submission.name });
+  };
+
+  if (isLoading) return <Container><Loading>Loading submissions...</Loading></Container>;
+  if (error) return <Container><Error>Error loading submissions: {error.message}</Error></Container>;
 
   return (
     <Container>
@@ -59,12 +61,18 @@ const SubmissionsDisplay: React.FC = () => {
       <SubmissionsTable
         submissions={filteredSubmissions}
         bindMutation={bindMutation}
+        deleteMutation={deleteMutation}
         bindingId={bindingId}
+        deletingId={deletingId}
         onBind={handleBind}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
-      <CreateSubmissionDialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
+      <CreateOrUpdateSubmissionDialog
+        isOpen={!!dialogState}
+        onClose={() => setDialogState(null)}
+        submissionId={dialogState?.id}
+        submissionName={dialogState?.name}
       />
     </Container>
   );

@@ -1,5 +1,8 @@
-import React, { useState } from "react";
-import { useCreateSubmissionMutation } from "../../api/submissions";
+import React, { useState, useEffect } from "react";
+import {
+  useCreateSubmissionMutation,
+  useEditSubmissionMutation,
+} from "../../api/submissions";
 import {
   Overlay,
   Dialog,
@@ -15,15 +18,25 @@ import {
 interface CreateSubmissionDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  submissionId?: number;
+  submissionName?: string;
 }
 
-const CreateSubmissionDialog: React.FC<CreateSubmissionDialogProps> = ({
+const CreateOrUpdateSubmissionDialog: React.FC<CreateSubmissionDialogProps> = ({
   isOpen,
   onClose,
+  submissionId,
+  submissionName = "",
 }) => {
-  const [name, setName] = useState("");
+  const [name, setName] = useState(submissionName);
   const [error, setError] = useState<string | null>(null);
   const createMutation = useCreateSubmissionMutation();
+  const editMutation = useEditSubmissionMutation();
+  const isEdit = !!submissionId;
+
+  useEffect(() => {
+    setName(submissionName);
+  }, [submissionName]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,12 +45,20 @@ const CreateSubmissionDialog: React.FC<CreateSubmissionDialogProps> = ({
       return;
     }
     try {
-      await createMutation.mutateAsync(name.trim());
+      if (isEdit) {
+        await editMutation.mutateAsync({ id: submissionId!, name: name.trim() });
+      } else {
+        await createMutation.mutateAsync(name.trim());
+      }
       setName("");
       setError(null);
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create submission");
+      setError(
+        err instanceof Error
+          ? err.message
+          : `Failed to ${isEdit ? "edit" : "create"} submission`
+      );
     }
   };
 
@@ -52,7 +73,7 @@ const CreateSubmissionDialog: React.FC<CreateSubmissionDialogProps> = ({
   return (
     <Overlay onClick={onClose}>
       <Dialog onClick={(e) => e.stopPropagation()}>
-        <Title>Create New Submission</Title>
+        <Title>{isEdit ? "Edit Submission" : "Create New Submission"}</Title>
         <Form onSubmit={handleSubmit}>
           <div>
             <Label htmlFor="name">Name</Label>
@@ -72,9 +93,15 @@ const CreateSubmissionDialog: React.FC<CreateSubmissionDialogProps> = ({
             <Button
               type="submit"
               variant="primary"
-              disabled={createMutation.isPending}
+              disabled={createMutation.isPending || editMutation.isPending}
             >
-              {createMutation.isPending ? "Creating..." : "Create"}
+              {createMutation.isPending || editMutation.isPending
+                ? isEdit
+                  ? "Saving..."
+                  : "Creating..."
+                : isEdit
+                ? "Save"
+                : "Create"}
             </Button>
           </ButtonGroup>
         </Form>
@@ -83,4 +110,4 @@ const CreateSubmissionDialog: React.FC<CreateSubmissionDialogProps> = ({
   );
 };
 
-export default CreateSubmissionDialog;
+export default CreateOrUpdateSubmissionDialog;
