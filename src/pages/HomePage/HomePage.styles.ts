@@ -9,7 +9,7 @@ export const Container = styled.div`
   align-items: center;
   justify-content: flex-start;
   flex-direction: column;
-  padding: 40px 16px;
+  padding: 100px 16px;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 `;
 
