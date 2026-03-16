@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import toast from "react-hot-toast";
 import {
   useSubmissionsQuery,
   useBindSubmissionMutation,
@@ -34,8 +35,20 @@ const SubmissionsDisplay: React.FC = () => {
   const handleCreateNew = () => setDialogState({});
 
   const handleBind = (id: number) => {
+    const label = submissions?.find((s) => s.id === id)?.name ?? `#${id}`;
     setBindingId(id);
-    bindMutation.mutate(id);
+    bindMutation.mutate(id, {
+      onSuccess: (submission) => {
+        if (submission.status === "bound") {
+          toast.success(`"${label}" bound successfully!`);
+          return;
+        }
+
+        toast.error(`Failed to bind "${label}".`);
+      },
+      onError:   () => toast.error(`Failed to bind "${label}".`),
+      onSettled: () => setBindingId(null),
+    });
   };
 
   const handleRequestDelete = (id: number) => {
