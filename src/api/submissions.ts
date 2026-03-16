@@ -39,7 +39,7 @@ export const bindSubmission = async (id: number): Promise<Submission> => {
 
 export const editSubmission = async (id: number, name: string): Promise<Submission> => {
   const response = await fetch(`${API_BASE}/submissions/${id}`, {
-    method: "PUT",
+    method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },
