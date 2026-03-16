@@ -6,7 +6,7 @@ export const Overlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(23, 33, 56, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,18 +14,20 @@ export const Overlay = styled.div`
 `;
 
 export const Dialog = styled.div`
-  background: #1f2937;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #dbe5f3;
+  border-radius: 14px;
   padding: 24px;
   width: 400px;
   max-width: 90vw;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  color: #f5f5f7;
+  box-shadow: 0 14px 30px rgba(99, 115, 140, 0.2);
+  color: #1f2a44;
 `;
 
 export const Title = styled.h2`
   margin: 0 0 16px 0;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
+  color: #334155;
 `;
 
 export const Form = styled.form`
@@ -35,19 +37,23 @@ export const Form = styled.form`
 `;
 
 export const Label = styled.label`
-  font-weight: bold;
+  font-weight: 600;
+  color: #475569;
 `;
 
 export const Input = styled.input`
-  padding: 8px;
-  border: 1px solid #374151;
-  border-radius: 4px;
-  background: #111827;
-  color: #f5f5f7;
-  font-size: 1rem;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #f8fbff;
+  color: #1f2a44;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: #93a9c6;
+    box-shadow: 0 0 0 2px rgba(147, 169, 198, 0.2);
   }
 `;
 
@@ -58,15 +64,16 @@ export const ButtonGroup = styled.div`
 `;
 
 export const Button = styled.button<{ variant?: "primary" | "secondary" }>`
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
+  padding: 8px 14px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 1rem;
-  background: ${({ variant }) => (variant === "primary" ? "#3b82f6" : "#374151")};
-  color: #f5f5f7;
+  font-size: 0.92rem;
+  background: ${({ variant }) => (variant === "primary" ? "#5b7fb0" : "#eef3f9")};
+  color: ${({ variant }) => (variant === "primary" ? "#ffffff" : "#334155")};
+  border-color: ${({ variant }) => (variant === "primary" ? "#4f73a2" : "#cbd5e1")};
+  transition: background-color 0.2s ease;
   &:hover {
-    background: ${({ variant }) => (variant === "primary" ? "#2563eb" : "#4b5563")};
+    background: ${({ variant }) => (variant === "primary" ? "#4d6f9d" : "#e2ebf6")};
   }
   &:disabled {
     opacity: 0.5;
@@ -75,6 +82,6 @@ export const Button = styled.button<{ variant?: "primary" | "secondary" }>`
 `;
 
 export const ErrorMessage = styled.div`
-  color: #ef4444;
+  color: #dc2626;
   font-size: 0.875rem;
 `;
